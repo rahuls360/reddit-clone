@@ -1,0 +1,23 @@
+<% include partials/header %>
+
+  <h1>Welcome to Reddit</h1>
+
+  <a href="/new">Create a new post</a>
+  <a href="/register">Sign Up</a>
+  <a href="/login">Login</a>
+  <a href="/users">View Users</a>
+
+  <% posts.forEach(function(post){ %>
+    <div>
+      <h3>
+        <%= post.title %>
+      </h3>
+      <p>
+        <%= post.text %>
+      </p>
+    </div>
+    <% }) %>
+
+
+
+      <% include partials/footer %>
