@@ -2,4 +2,10 @@
 
   <h1>Login to account</h1>
 
+    <form action="/login" method="POST">
+      <input type="text" placeholder="Username" name="username" required>
+      <input type="password" placeholder="Password" name="password" required>
+      <input type="submit" name="submit">
+    </form>
+
   <% include partials/footer %>
