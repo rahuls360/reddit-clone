@@ -13,6 +13,7 @@ mongoose.connect("mongodb://localhost:27017/reddit-clone", {
   useNewUrlParser: true
 });
 
+//setup session
 app.use(expressSession({
   secret: "The secret message",
   resave: false,
@@ -23,18 +24,24 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+
+//setup passport
 app.use(express.static(__dirname + '/public'));
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.use(function(req, res, next){
+  res.locals.user = req.user;
+  next();
+});
 
 
 
+// Routes
 
 app.get('/', (req, res) => {
   Post.find({}, function (err, foundPosts) {
@@ -112,8 +119,23 @@ app.post('/login', passport.authenticate('local', {
 //   });
 // });
 
+app.get('/logout', (req, res) => {
+  console.log(req.user);
+  req.logout();
+  res.redirect("/");
+  console.log(req.user);
+});
+
 app.get('/users', (req, res) => {
-  res.render("users");
+  User.find({}, function(err, users){
+    if(err){
+      console.log(err);
+      res.redirect('/');
+    }else{
+      console.log(users);
+      res.render("users", {users: users});
+    }
+  })
 });
 
 app.listen(3000, function () {

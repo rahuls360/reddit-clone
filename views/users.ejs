@@ -2,4 +2,12 @@
 
   <h1>List of users goes here</h1>
 
+ <% if(users){ %>
+  <% users.forEach(function(user){ %>
+    <div class="user"><%= user.username %></div>
+ <% }); %>
+<% }else{ %>
+  <div class="user">This is an empty island</div>
+<% } %>
+
   <% include partials/footer %>
