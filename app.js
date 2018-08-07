@@ -8,6 +8,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const passportLocalMongoose = require('passport-local-mongoose');
 const expressSession = require('express-session');
+const middleware  = require('./middleware');
 
 mongoose.connect("mongodb://localhost:27017/reddit-clone", {
   useNewUrlParser: true
@@ -58,24 +59,32 @@ app.get('/', (req, res) => {
   });
 });
 
-app.get('/new', (req, res) => {
+app.get('/new', middleware.isLoggedIn , (req, res) => {
   res.render('new');
 });
 
 app.post('/', (req, res) => {
   let body = req.body;
-  Post.create({
-    title: body.title,
-    text: body.text
-  }, function (err, newPost) {
-    if (err) {
-      console.log(err);
-      res.redirect('/');
-    } else {
-      console.log("Created new post");
-      console.log(newPost);
-      res.redirect('/');
-    }
+  let username = {
+    username: req.user.username,
+    id: req.user._id
+  };
+  console.log(req.user._id);
+  User.findById(req.user._id, function(err, foundUser){
+    Post.create({
+      title: body.title,
+      text: body.text,
+      user: username
+    }, function (err, newPost) {
+      if (err) {
+        console.log(err);
+        res.redirect('/');
+      } else {
+        console.log("Created new post");
+        console.log(newPost);
+        res.redirect('/');
+      }
+    });
   })
 })
 
