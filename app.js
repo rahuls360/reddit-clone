@@ -9,6 +9,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const passportLocalMongoose = require('passport-local-mongoose');
 const expressSession = require('express-session');
 const middleware  = require('./middleware');
+const methodOverride = require('method-override');
 
 mongoose.connect("mongodb://localhost:27017/reddit-clone", {
   useNewUrlParser: true
@@ -25,6 +26,8 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+
+app.use(methodOverride('_method'));
 
 //setup passport
 app.use(express.static(__dirname + '/public'));
@@ -50,8 +53,6 @@ app.get('/', (req, res) => {
       console.log(err);
       res.redirect('/');
     } else {
-      console.log("Found Posts");
-      console.log(foundPosts);
       res.render('index', {
         posts: foundPosts
       });
@@ -88,6 +89,17 @@ app.post('/', (req, res) => {
   })
 })
 
+app.get('/posts/:id', (req, res) => {
+  Post.findById(req.params.id, function(err, foundPost){
+    if(err){
+      console.log(err);
+      res.redirect('/');
+    }else{
+      res.render('show', {post: foundPost});
+    }
+  })
+});
+
 app.get('/register', (req, res) => {
   res.render("register");
 });
@@ -104,6 +116,18 @@ app.post('/register', (req, res) => {
   })
 });
 
+app.delete('/posts/:id', middleware.checkUserAuthentication ,(req, res) => {
+  Post.findByIdAndRemove(req.params.id, function(err, success){
+    if(err){
+      console.log(err);
+    }else{
+      console.log("Delete successful");
+    }
+    console.log(req.user);
+    res.redirect('/');
+  })
+});
+
 app.get('/login', (req, res) => {
   res.render("login");
 });
@@ -113,20 +137,6 @@ app.post('/login', passport.authenticate('local', {
   failureRedirect: "/login"
 }) ,(req, res) => {
 });
-
-// app.post('/login',(req, res) => {
-//   User.find({username: req.body.username}, function(err, user){
-//     req.login(user, function(err){
-//       if(err){
-//         console.log(err);
-//         res.redirect('/login');
-//       }else{
-//         console.log("Logged in");
-//         res.redirect('/');
-//       }
-//     });
-//   });
-// });
 
 app.get('/logout', (req, res) => {
   console.log(req.user);
