@@ -100,6 +100,21 @@ app.get('/posts/:id', (req, res) => {
   })
 });
 
+app.put('/posts/:id', middleware.checkUserAuthentication ,(req, res) => {
+  console.log("inside put route");
+  Post.findByIdAndUpdate(req.params.id, {$set:req.body} ,function(err, updatePost){
+    if(err){
+      console.log("error");
+      console.log(err);
+      res.redirect('/');
+    }else{
+      console.log("Update Post wala");
+      console.log(updatePost);
+      res.render('edit', {post: updatePost});
+    }
+  });
+});
+
 app.get('/register', (req, res) => {
   res.render("register");
 });

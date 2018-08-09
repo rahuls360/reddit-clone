@@ -21,8 +21,10 @@ function checkUserAuthentication(req, res, next){
             }else{
                 console.log(foundPost);
                 if(req.user._id.equals(foundPost.user.id)){
+                    console.log("Next");
                     next();
                 }else{
+                    console.log("not Next");
                     res.redirect('/');
                     console.log("You are not authorized to do that");
                 }
